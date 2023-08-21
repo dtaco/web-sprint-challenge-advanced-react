@@ -51,17 +51,40 @@ export default class AppClass extends React.Component {
       xy: initialIndex,
       formValues: '',
     })
-    console.log('You reset everything!')
+    // console.log('You reset everything!')
   }
 
   getNextIndex = (direction) => {
+    const x = this.state.x;
+    const y = this.state.y;
+    const steps = this.state.steps + 1
+    const xy = this.state.xy;
+
+    const newX = 
+      direction === 'left' ? (x-1 === 0 ? x : x-1) :
+      direction === 'right' ? (x+1 === 4 ? x : x+1) : 
+      x;
+
+    const newY =
+      direction === 'up' ? (y-1 === 0 ? y : y-1) :
+      direction === 'down' ? (y+1 === 4 ? y : y+1) :
+      y;
+
+    const newXY =
+      direction === 'left' || direction === 'up' ? this.state.xy - 1 :
+      direction === 'right' || direction === 'down' ? this.state.xy + 3 :
+      this.state.xy;
+
+    return {"x" : newX, "y": newY, "xy" : newXY, "steps": steps};
     // This helper takes a direction ("left", "up", etc) and calculates what the next index
     // of the "B" would be. If the move is impossible because we are at the edge of the grid,
     // this helper should return the current index unchanged.
   }
 
   move = (evt) => {
-
+    console.log('You clicked ' + `${evt.target.id}`);
+    
+    console.log(this.getNextIndex(evt.target.id));
     // This event handler can use the helper above to obtain a new index for the "B",
     // and change any states accordingly.
   }
@@ -93,13 +116,13 @@ export default class AppClass extends React.Component {
           }
         </div>
         <div className="info">
-          <h3 id="message"></h3>
+          <h3 id="message">{this.state.message}</h3>
         </div>
         <div id="keypad">
-          <button id="left">LEFT</button>
-          <button id="up">UP</button>
-          <button id="right">RIGHT</button>
-          <button id="down">DOWN</button>
+          <button id="left" onClick={(evt) => this.move(evt)}>LEFT</button>
+          <button id="up" onClick={(evt) => this.move(evt)}>UP</button>
+          <button id="right" onClick={(evt) => this.move(evt)}>RIGHT</button>
+          <button id="down" onClick={(evt) => this.move(evt)}>DOWN</button>
           <button id="reset" onClick={() => this.reset()}>reset</button>
         </div>
         <form>
