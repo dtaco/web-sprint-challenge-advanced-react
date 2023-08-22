@@ -35,8 +35,8 @@ export default class AppClass extends React.Component {
       "33": [2, 2],
     };
   
-    const [newcurrentX, newcurrentY] = coordinatesMap[coordinate]; //this SHOULD set the coordinates based on the object above
-    this.move(newcurrentX + newcurrentY * 3, newcurrentX + 1, newcurrentY + 1);
+    const [newX, newY] = coordinatesMap[coordinate]; //this SHOULD set the coordinates based on the object above
+    this.move(newX + newY * 3, newX + 1, newY + 1);
   };
   
 
@@ -82,24 +82,24 @@ export default class AppClass extends React.Component {
   getNextIndex = (direction) => {
     const { currentX, currentY } = this.state.grid;
   
-    let newcurrentX = currentX;
-    let newcurrentY = currentY;
+    let newX = currentX;
+    let newY = currentY;
   
     if (direction === "left" && currentX !== 1) {
-      newcurrentX = currentX - 1;
+      newX = currentX - 1;
     } else if (direction === "right" && currentX !== 3) {
-      newcurrentX = currentX + 1;
+      newX = currentX + 1;
     } else if (direction === "up" && currentY !== 1) {
-      newcurrentY = currentY - 1;
+      newY = currentY - 1;
     } else if (direction === "down" && currentY !== 3) {
-      newcurrentY = currentY + 1;
+      newY = currentY + 1;
     } else {
       this.getXYMessage(direction);
       return;
       //return without performing anything else...
     }
   
-    this.getXY(`${newcurrentX}${newcurrentY}`, newcurrentX, newcurrentY);
+    this.getXY(`${newX}${newY}`, newX, newY); //if we get here we run getXY method with new values
   };
 
   move = (newIndex, newX, newY) => {
@@ -119,7 +119,8 @@ export default class AppClass extends React.Component {
   onChange = (evt) => {
     const emailInput = evt.target.value;
     this.setState({
-      ...this.state, grid: {
+      ...this.state, 
+      grid: {
         ...this.state.grid,
         email: emailInput
       }
@@ -136,7 +137,7 @@ export default class AppClass extends React.Component {
         grid: {
           ...this.state.grid,
           message: res.data.message,
-          email: ""
+          email: '' //reset the email
         }
       })
     })

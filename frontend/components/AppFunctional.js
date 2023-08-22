@@ -1,39 +1,98 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-// Suggested initial states
 const initialMessage = ''
 const initialEmail = ''
 const initialSteps = 0
 const initialIndex = 4 // the index the "B" is at
 
 export default function AppFunctional(props) {
-  // THE FOLLOWING HELPERS ARE JUST RECOMMENDATIONS.
-  // You can delete them and build your own logic from scratch.
+ const [gridState, setGridState] = useState({
+    message: initialMessage,
+    email: initialEmail,
+    steps: initialSteps,
+    index: initialIndex,
+    currentX: 2,
+    currentY: 2
+ })
 
-  function getXY() {
-    // It it not necessary to have a state to track the coordinates.
-    // It's enough to know what index the "B" is at, to be able to calculate them.
+  function getXY(coordinate) {
+    const coordinatesMap = {
+      '11': [0,0],
+      '21': [1,0],
+      '31': [2,0],
+      '12': [0,1],
+      '22': [1,1],
+      '32': [2,1],
+      '13': [0,2],
+      '23': [1,2],
+      '33': [2,2]
+    };
+
+    const [newX, newY] = coordinatesMap[coordinate];
+    move(newX + newY * 3, newX + 1, newY + 1);
   }
 
-  function getXYMessage() {
-    // It it not necessary to have a state to track the "Coordinates (2, 2)" message for the user.
-    // You can use the `getXY` helper above to obtain the coordinates, and then `getXYMessage`
-    // returns the fully constructed string.
+  function getXYMessage(direction) {
+   let message = '';
+
+   if (direction === 'left') {
+    message = `You can't go ${direction}`;
+   } else if (direction === 'right') {
+    message = `You can't go ${direction}`;
+   } else if (direction === 'up') {
+    message = `You can't go ${direction}`;
+   } else if (direction === 'down') {
+    message = `You can't go ${direction}`;
+   }
+
+   setGridState({
+    ...gridState,
+    message: message
+   });
   }
 
   function reset() {
-    // Use this helper to reset all states to their initial values.
+    setGridState({
+      message: initialMessage,
+      email: initialEmail,
+      index:initialIndex,
+      steps: initialSteps,
+      currentX: 2,
+      currentY: 2
+    })
   }
 
   function getNextIndex(direction) {
-    // This helper takes a direction ("left", "up", etc) and calculates what the next index
-    // of the "B" would be. If the move is impossible because we are at the edge of the grid,
-    // this helper should return the current index unchanged.
+    const { currentX, currentY } = gridState;
+
+    let newX = currentX;
+    let newY = currentY;
+
+    if (direction === 'left' && currentX !== 1) {
+      newX = currentX - 1;
+    } else if (direction === 'right' && currentX !== 3) {
+      newX = currentX + 1;
+    } else if (direction === 'up' && currentY !== 1) {
+      newY = currentY - 1;
+    } else if (direction === 'down' && currentY !== 3) {
+      newY = currentY + 1;
+    } else {
+      getXYMessage(direction);
+      return;
+    }
+
+    getXY(`${newX}${newY}`, newX, newY);
   }
 
-  function move(evt) {
-    // This event handler can use the helper above to obtain a new index for the "B",
-    // and change any states accordingly.
+  function move(newIndex, newX, newY) {
+    setGridState({
+      ...gridState,
+      index: newIndex,
+      currentX: newX,
+      currentY: newY,
+      steps: gridState.steps + 1,
+      message: '',
+    });
   }
 
   function onChange(evt) {
