@@ -181,8 +181,15 @@ export default class AppClass extends React.Component {
           <button id="reset" onClick={this.reset}>reset</button>
         </div>
         <form onSubmit={this.onSubmit}>
-          <input id="email" type="email" placeholder="Your Email" value={this.state.grid.email} onChange={this.onChange}></input>
-          <input id="submit" type="submit"></input>
+          <input 
+            id="email" 
+            type="email" 
+            placeholder="Your Email" 
+            value={this.state.grid.email} 
+            onChange={this.onChange}></input>
+          <input 
+            id="submit" 
+            type="submit"></input>
         </form>
       </div>
     )

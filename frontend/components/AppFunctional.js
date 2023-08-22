@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import axios from 'axios';
 
 const initialMessage = ''
 const initialEmail = ''
@@ -96,11 +97,37 @@ export default function AppFunctional(props) {
   }
 
   function onChange(evt) {
-    
+    const emailInput = evt.target.value;
+
+    setGridState({
+      ...gridState,
+      email: emailInput
+    });
   }
 
   function onSubmit(evt) {
-    
+    evt.preventDefault();
+
+    const URL = 'http://localhost:9000/api/result';
+    axios.post(URL, {
+      x: gridState.currentX,
+      y: gridState.currentY,
+      steps: gridState.steps,
+      email: gridState.email
+    })
+    .then((res) => {
+      setGridState({
+        ...gridState,
+        message: res.data.message,
+        email: ''
+      });
+    })
+    .catch((err) => {
+      setGridState({
+        ...gridState,
+        message: err.response.data.message
+      });
+    });
   }
 
   return (
@@ -128,9 +155,18 @@ export default function AppFunctional(props) {
         <button id="down" onClick={() => getNextIndex('down')}>DOWN</button>
         <button id="reset" onClick={() => reset()}>reset</button>
       </div>
-      <form>
-        <input id="email" type="email" placeholder="type email"></input>
-        <input id="submit" type="submit"></input>
+      <form onSubmit={onSubmit}>
+        <input 
+          id="email" 
+          type="email" 
+          placeholder="type email" 
+          value={gridState.email}
+          onChange={onChange} 
+          ></input>
+        <input 
+          id="submit" 
+          type="submit"
+        ></input>
       </form>
     </div>
   )
