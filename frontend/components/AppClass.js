@@ -1,132 +1,186 @@
 import React from 'react'
+import axios from "axios"
 
-// Suggested initial states
-const initialMessage = '';
-const initialEmail = '';
-const initialSteps = 0;
-const initialIndex = 4;// the index the "B" is at
-const initialX = 2;
-const initialY = 2;
-
-// const initialState = {
-//   message: initialMessage,
-//   email: initialEmail,
-//   index: initialIndex,
-//   steps: initialSteps,
-// }
+//starting state - I should not touch this...
+const initialState = {
+  message: '',
+  email: '',
+  index: 4,
+  steps: 0,
+}
 
 export default class AppClass extends React.Component {
-  constructor() {
+  constructor(){
     super();
-
+    //my state lives here
     this.state = {
-      x: initialX,
-      y: initialY,
-      steps:initialSteps,
-      xy: initialIndex,
-      message: initialMessage,
-      formValues: ''
+      grid: {
+        ...initialState,
+      currentX: 2,
+      currentY: 2
+      }
     }
   }
 
-  getXY = () => {
-    // It it not necessary to have a state to track the coordinates.
-    // It's enough to know what index the "B" is at, to be able to calculate them.
-    return(`(${this.state.x},${this.state.y})`)
-  }
+  getXY = (coordinate) => {
+    const coordinatesMap = {
+      "11": [0, 0],
+      "21": [1, 0],
+      "31": [2, 0],
+      "12": [0, 1],
+      "22": [1, 1],
+      "32": [2, 1],
+      "13": [0, 2],
+      "23": [1, 2],
+      "33": [2, 2],
+    };
+  
+    const [newcurrentX, newcurrentY] = coordinatesMap[coordinate]; //this SHOULD set the coordinates based on the object above
+    this.move(newcurrentX + newcurrentY * 3, newcurrentX + 1, newcurrentY + 1);
+  };
+  
 
-  // POSSIBLY NOT NECESSARY
-  // getXYMessage = () => {
-  //   // It it not necessary to have a state to track the "Coordinates (2, 2)" message for the user.
-  //   // You can use the `getXY` helper above to obtain the coordinates, and then `getXYMessage`
-  //   // returns the fully constructed string.
-  // }
+  getXYMessage = (direction) => {
+    let message = "";
+    
+    if (direction === "left") {
+      message = "You can't go left";
+    } else if (direction === "right") {
+      message = "You can't go right";
+    } else if (direction === "up") {
+      message = "You can't go up";
+    } else if (direction === "down") {
+      message = "You can't go down";
+    }
+  
+    this.setState({
+      ...this.state,
+      grid: {
+        ...this.state.grid,
+        message: message
+      }
+    });
+  }
+  
 
   reset = () => {
     this.setState({
-      x: initialX,
-      y: initialY,
-      steps: initialSteps,
-      message: initialMessage,
-      xy: initialIndex,
-      formValues: '',
+      ...this.state,
+      grid: {
+        message: initialState.message,
+        email: initialState.email,
+        index: initialState.index, 
+        steps: initialState.steps,
+        currentX: 2,
+        currentY: 2
+      }
     })
-    // console.log('You reset everything!')
+
+    console.log('You reset everything!')
   }
 
   getNextIndex = (direction) => {
-    const x = this.state.x;
-    const y = this.state.y;
-    const steps = this.state.steps + 1
-    const xy = this.state.xy;
+    const { currentX, currentY } = this.state.grid;
+  
+    let newcurrentX = currentX;
+    let newcurrentY = currentY;
+  
+    if (direction === "left" && currentX !== 1) {
+      newcurrentX = currentX - 1;
+    } else if (direction === "right" && currentX !== 3) {
+      newcurrentX = currentX + 1;
+    } else if (direction === "up" && currentY !== 1) {
+      newcurrentY = currentY - 1;
+    } else if (direction === "down" && currentY !== 3) {
+      newcurrentY = currentY + 1;
+    } else {
+      this.getXYMessage(direction);
+      return;
+      //return without performing anything else...
+    }
+  
+    this.getXY(`${newcurrentX}${newcurrentY}`, newcurrentX, newcurrentY);
+  };
 
-    const newX = 
-      direction === 'left' ? (x-1 === 0 ? x : x-1) :
-      direction === 'right' ? (x+1 === 4 ? x : x+1) : 
-      x;
-
-    const newY =
-      direction === 'up' ? (y-1 === 0 ? y : y-1) :
-      direction === 'down' ? (y+1 === 4 ? y : y+1) :
-      y;
-
-    const newXY =
-      direction === 'left' || direction === 'up' ? this.state.xy - 1 :
-      direction === 'right' || direction === 'down' ? this.state.xy + 3 :
-      this.state.xy;
-
-    return {"x" : newX, "y": newY, "xy" : newXY, "steps": steps};
-    // This helper takes a direction ("left", "up", etc) and calculates what the next index
-    // of the "B" would be. If the move is impossible because we are at the edge of the grid,
-    // this helper should return the current index unchanged.
-  }
-
-  move = (evt) => {
-    console.log('You clicked ' + `${evt.target.id}`);
-    
-    console.log(this.getNextIndex(evt.target.id));
-    // This event handler can use the helper above to obtain a new index for the "B",
-    // and change any states accordingly.
+  move = (newIndex, newX, newY) => {
+    this.setState({
+      ...this.state,
+      grid: {
+        ...this.state.grid,
+        index: newIndex,
+        currentX: newX,
+        currentY: newY,
+        steps: this.state.grid.steps + 1,
+        message: ''
+      }
+    })
   }
 
   onChange = (evt) => {
-    // You will need this to update the value of the input.
+    const emailInput = evt.target.value;
+    this.setState({
+      ...this.state, grid: {
+        ...this.state.grid,
+        email: emailInput
+      }
+    })
   }
 
-  onSubmit = (evt) => {
-    evt.preventDefailt();
-    // Use a POST request to send a payload to the server.
+  onSubmit = (evt) => { 
+    evt.preventDefault();
+    const URL = "http://localhost:9000/api/result" 
+    axios.post(URL, {"x": this.state.grid.currentX, "y": this.state.grid.currentY, "steps": this.state.grid.steps, "email": this.state.grid.email})
+    .then(res => {
+      this.setState({
+        ...this.state, 
+        grid: {
+          ...this.state.grid,
+          message: res.data.message,
+          email: ""
+        }
+      })
+    })
+    .catch(error => {
+      this.setState({
+        ...this.state,
+        grid: {
+          ...this.state.grid,
+          message: error.response.data.message
+        }
+      })
+    });
   }
 
   render() {
+
     const { className } = this.props
     return (
       <div id="wrapper" className={className}>
         <div className="info">
-          <h3 id="coordinates">Coordinates {this.getXY()}</h3>
-          <h3 id="steps">You moved 0 times</h3>
+          <h3 id="coordinates">Coordinates ({this.state.grid.currentX}, {this.state.grid.currentY})</h3>
+          <h3 id="steps">You moved {this.state.grid.steps} {this.state.grid.steps === 1 ? "time" : "times"}</h3>
         </div>
         <div id="grid">
           {
             [0, 1, 2, 3, 4, 5, 6, 7, 8].map(idx => (
-              <div key={idx} className={`square${idx === 4 ? ' active' : ''}`}>
-                {idx === 4 ? 'B' : null}
+              <div key={idx} className={`square${idx === this.state.grid.index ? ' active' : ''}`}>
+                {idx === this.state.grid.index ? 'B' : null}
               </div>
             ))
           }
         </div>
         <div className="info">
-          <h3 id="message">{this.state.message}</h3>
+          <h3 id="message">{this.state.grid.message}</h3>
         </div>
         <div id="keypad">
-          <button id="left" onClick={(evt) => this.move(evt)}>LEFT</button>
-          <button id="up" onClick={(evt) => this.move(evt)}>UP</button>
-          <button id="right" onClick={(evt) => this.move(evt)}>RIGHT</button>
-          <button id="down" onClick={(evt) => this.move(evt)}>DOWN</button>
-          <button id="reset" onClick={() => this.reset()}>reset</button>
+          <button id="left" onClick={() => this.getNextIndex("left")}>LEFT</button>
+          <button id="up" onClick={() => this.getNextIndex("up")}>UP</button>
+          <button id="right" onClick={() => this.getNextIndex("right")}>RIGHT</button>
+          <button id="down" onClick={() => this.getNextIndex("down")}>DOWN</button>
+          <button id="reset" onClick={this.reset}>reset</button>
         </div>
-        <form>
-          <input id="email" type="email" placeholder="type email"></input>
+        <form onSubmit={this.onSubmit}>
+          <input id="email" type="email" placeholder="Your Email" value={this.state.grid.email} onChange={this.onChange}></input>
           <input id="submit" type="submit"></input>
         </form>
       </div>
