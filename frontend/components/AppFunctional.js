@@ -126,7 +126,7 @@ export default function AppFunctional(props) {
         <button id="up" onClick={() => getNextIndex('up')}>UP</button>
         <button id="right" onClick={() => getNextIndex('right')}>RIGHT</button>
         <button id="down" onClick={() => getNextIndex('down')}>DOWN</button>
-        <button id="reset">reset</button>
+        <button id="reset" onClick={() => reset()}>reset</button>
       </div>
       <form>
         <input id="email" type="email" placeholder="type email"></input>
