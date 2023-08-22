@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 const initialMessage = ''
 const initialEmail = ''
 const initialSteps = 0
-const initialIndex = 4 // the index the "B" is at
+const initialIndex = 4 
 
 export default function AppFunctional(props) {
  const [gridState, setGridState] = useState({
@@ -96,36 +96,36 @@ export default function AppFunctional(props) {
   }
 
   function onChange(evt) {
-    // You will need this to update the value of the input.
+    
   }
 
   function onSubmit(evt) {
-    // Use a POST request to send a payload to the server.
+    
   }
 
   return (
     <div id="wrapper" className={props.className}>
       <div className="info">
-        <h3 id="coordinates">Coordinates (2, 2)</h3>
-        <h3 id="steps">You moved 0 times</h3>
+        <h3 id="coordinates">Coordinates ({gridState.currentX}, {gridState.currentY})</h3>
+        <h3 id="steps">You moved {gridState.steps} {gridState.steps === 1 ? 'time' : 'times'} </h3>
       </div>
       <div id="grid">
         {
           [0, 1, 2, 3, 4, 5, 6, 7, 8].map(idx => (
-            <div key={idx} className={`square${idx === 4 ? ' active' : ''}`}>
-              {idx === 4 ? 'B' : null}
+            <div key={idx} className={`square${idx === gridState.index ? ' active' : ''}`}>
+              {idx === gridState.index ? 'B' : null}
             </div>
           ))
         }
       </div>
       <div className="info">
-        <h3 id="message"></h3>
+        <h3 id="message">{gridState.message}</h3>
       </div>
       <div id="keypad">
-        <button id="left">LEFT</button>
-        <button id="up">UP</button>
-        <button id="right">RIGHT</button>
-        <button id="down">DOWN</button>
+        <button id="left" onClick={() => getNextIndex('left')}>LEFT</button>
+        <button id="up" onClick={() => getNextIndex('up')}>UP</button>
+        <button id="right" onClick={() => getNextIndex('right')}>RIGHT</button>
+        <button id="down" onClick={() => getNextIndex('down')}>DOWN</button>
         <button id="reset">reset</button>
       </div>
       <form>

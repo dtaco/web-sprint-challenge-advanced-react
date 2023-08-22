@@ -44,13 +44,13 @@ export default class AppClass extends React.Component {
     let message = "";
     
     if (direction === "left") {
-      message = "You can't go left";
+      message = `You can't go ${direction}`;
     } else if (direction === "right") {
-      message = "You can't go right";
+      message = `You can't go ${direction}`;
     } else if (direction === "up") {
-      message = "You can't go up";
+      message = `You can't go ${direction}`;
     } else if (direction === "down") {
-      message = "You can't go down";
+      message = `You can't go ${direction}`;
     }
   
     this.setState({
